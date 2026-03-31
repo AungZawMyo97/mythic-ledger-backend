@@ -1,0 +1,6 @@
+@mythic_ledger_backend_HostAddress = http://localhost:5270
+
+GET {{mythic_ledger_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
