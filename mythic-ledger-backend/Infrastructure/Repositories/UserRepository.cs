@@ -18,4 +18,9 @@ public class UserRepository : IUserRepository
         return await _applicationDbContext.Users.SingleOrDefaultAsync(u => u.Email == email);
     }
 
+    public async Task<User?> GetByIdAsync(string id)
+    {
+        return await _applicationDbContext.Users.FindAsync(id);
+    }
+
 }

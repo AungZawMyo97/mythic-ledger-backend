@@ -14,6 +14,28 @@ public class ApplicationDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderType> OrderTypes { get; set; }
 
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+        foreach (var entry in entries)
+        {
+            var dateTimeProperties = entry.Properties
+                .Where(p => p.Metadata.ClrType == typeof(DateTime) || p.Metadata.ClrType == typeof(DateTime?));
+
+            foreach (var prop in dateTimeProperties)
+            {
+                if (prop.CurrentValue is DateTime dt && dt.Kind == DateTimeKind.Unspecified)
+                {
+                    prop.CurrentValue = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+                }
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>("public", "UserRole");
