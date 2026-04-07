@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using mythic_ledger_backend.Domain.Entities;
 
 namespace mythic_ledger_backend.Domain.DbContexts;
@@ -52,6 +52,18 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        modelBuilder.Entity<Customer>()
+            .HasOne(c => c.ShopAdmin)
+            .WithMany()
+            .HasForeignKey(c => c.ShopAdminUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Customer>()
+            .HasMany(c => c.Orders)
+            .WithOne()
+            .HasForeignKey(o => o.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
